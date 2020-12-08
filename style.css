@@ -1,0 +1,17 @@
+.img_box{
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.img_text{
+  margin: auto;
+  padding: 25px;
+  margin-top: 20px;
+  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, .5);
+ 
+}
+
+.img_text img{
+  width: 300px;
+}

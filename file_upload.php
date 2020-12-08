@@ -1,7 +1,8 @@
 <?php
 
+require_once "./dbc.php";
+
 $file = $_FILES['image'];
-var_dump($file);
 
 
 // ファイル関連の取得 http://localhost/upload/upload_form.php
@@ -12,13 +13,26 @@ $filesize = $file['size'];
 $upload_dir = './images/';
 $save_filename = date('YmdHis') . $filename;
 $err_msgs = array();
+$save_path = $upload_dir . $save_filename;
+
+// キャプションを取得
+$caption = filter_input(INPUT_POST, 'caption', FILTER_SANITIZE_SPECIAL_CHARS);
+
+//キャプションのバリデーション
+if (empty($caption)) {
+  array_push($err_msgs, 'キャプションを入力してください');
+}
+
+//140文字か
+if (strlen($caption) > 140) {
+  array_push($err_msgs, 'キャプションは140文字以内で入力してください');
+}
 
 
 //ファイルのバリデーション
 // ファイルのサイズが1MB未満か
 if ($filesize > 10048576 || $file_err == 2) {
   array_push($err_msgs, 'ファイルサイズが大きすぎます。');
-  echo '<br>';
 }
 
 // 拡張子は画像形式か
@@ -27,14 +41,23 @@ $file_ext = pathinfo($filename, PATHINFO_EXTENSION);
 
 if (!in_array(strtolower($file_ext), $allow_ext)) {
   array_push($err_msgs, '画像ファイルを添付してください。');
-  echo '<br>';
 }
 
 if (count($err_msgs) === 0) {
   // ファイルはあるかどうか
   if (is_uploaded_file($tmp_path)) {
-    if (move_uploaded_file($tmp_path, $upload_dir . $save_filename)) {
-      echo $filename . 'を' . $upload_dir . 'アップしました。';
+    if (move_uploaded_file($tmp_path, $save_path)) {
+      // echo $filename . 'を' . $upload_dir . 'アップしました。';
+      //DBに保存（ファイル名、ファイルパス、キャプション）
+      $result = fileSave($filename, $save_path, $caption);
+
+      if ($result) {
+        // echo 'データベースに保存しました';
+        header('Location:upload_form.php');
+        exit();
+      } else {
+        echo 'データベースへの保存が失敗しました';
+      }
     } else {
       echo 'ファイルが保存出来ませんでした。';
     }
@@ -48,6 +71,7 @@ if (count($err_msgs) === 0) {
     echo '<br>';
   }
 }
+
 ?>
 
-<a href="http://localhost/upload/upload_form.php">戻る</a>
+<!-- <a href="http://localhost/upload/upload_form.php">戻る</a> -->
