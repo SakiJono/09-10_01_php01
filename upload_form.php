@@ -15,24 +15,35 @@ $files = getALLfile();
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>アップロードフォーム</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v">
 </head>
 
 <body>
-  <form action="file_upload.php" method="post" enctype="multipart/form-data">
-    <input type="file" name="image">
-    <input type="submit" value="アップロード">
-    <textarea name="caption" placeholder="キャプション" id="caption" cols="30" rows="10"></textarea>
-  </form>
+  <div class="upload">
 
-  <div class="img_box">
-    <?php foreach ($files as $file) : ?>
-      <div class="img_text">
-        <img src="<?php echo "{$file['file_path']}"; ?>" alt="" >
-        <p><?php echo h("{$file['description']}"); ?></p>
-      </div>
-    <?php endforeach; ?>
+    <div class="form">
+      <form action="file_upload.php" method="post" enctype="multipart/form-data">
+        <input type="file" name="image">
+        <input type="submit" value="アップロード">
+        <textarea name="caption" placeholder="キャプション" id="caption" cols="30" rows="10"></textarea>
+      </form>
+      <!-- <button><a href="./userdata/userdata_edit.php">password変更</a></button> -->
+    </div>
+
+    <div class="img_box">
+      <?php foreach ($files as $file) : ?>
+        <div class="content">
+          <button class="edit"><a href="edit.php?id=<?php echo $file['id'] ?>">edit</a></button>
+          <button class="delete"><a href="delete.php?id=<?php echo $file['id'] ?>">×</a></button>
+          <div class="img_text">
+            <img src="<?php echo "{$file['file_path']}"; ?>" alt="">
+            <p><?php echo "{$file['description']}"; ?></p>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
+
 </body>
 
 </html>

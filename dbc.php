@@ -61,7 +61,7 @@ function fileSave($filename, $save_path, $caption)
 
 function getALLfile()
 {
-  $sql = "SELECT * FROM file_table";
+  $sql = "SELECT * FROM file_table ORDER BY id DESC";
 
   $fileData = dbc()->query($sql);
 
