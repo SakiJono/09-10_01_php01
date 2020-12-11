@@ -19,6 +19,5 @@ if ($status == false) {
   echo json_encode(["error_msg" => "{$error[2]}"]);
   exit();
 } else {
-  header("Location:upload_form
-  .php");
+  header("Location:upload_form.php");
 }
