@@ -1,10 +1,27 @@
 <?php
-
 require_once "./dbc.php";
 $files = getALLfile();
+?>
 
+<?php
+session_start(); // 必須！
+check_session_id();
+include('userdata_table.php');
+$pdo = connect_to_db();
 
+// データ取得SQL作成
+$sql = 'SELECT * FROM users_table';
 
+// SQL準備&実行
+$stmt = $pdo->prepare($sql);
+$status = $stmt->execute();
+if ($status == false) {
+  $error = $stmt->errorInfo();
+  exit('sqlError:' . $error[2]);
+} else {
+  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $json = json_encode($result);
+}
 ?>
 
 
@@ -19,24 +36,38 @@ $files = getALLfile();
 </head>
 
 <body>
+  <header class="header">
+    <div><img src="" alt=""><?php echo $_SESSION["username"]; ?></div>
+    <div class="headerbtn">Home</div>
+    <div class="headerbtn">Search</div>
+    <div class="headerbtn"><a href="logout.php">logout</a></div>
+    <div class="headerbtn"><a href="userdata_read.php">Administrator</a></div>
+  </header>
+
   <div class="upload">
 
-    <div class="form">
-      <form action="file_upload.php" method="post" enctype="multipart/form-data">
-        <input type="file" name="image">
-        <input type="submit" value="アップロード">
-        <textarea name="caption" placeholder="キャプション" id="caption" cols="30" rows="10"></textarea>
-      </form>
+    <div>
+      <div class="form">
+        <img src="" id="preview" class="preview">
+        <form action="file_upload.php" method="post" enctype="multipart/form-data">
+          <input type="file" name="image" id="file1" accept="image/*">
+          <input type="submit" value="アップロード">
+          <textarea name="caption" placeholder="キャプション" id="caption" cols="32" rows="10"></textarea>
+        </form>
+      </div>
+
       <!-- <button><a href="./userdata/userdata_edit.php">password変更</a></button> -->
     </div>
 
     <div class="img_box">
       <?php foreach ($files as $file) : ?>
         <div class="content">
-          <button class="edit"><a href="edit.php?id=<?php echo $file['id'] ?>">edit</a></button>
-          <button class="delete"><a href="delete.php?id=<?php echo $file['id'] ?>">×</a></button>
+          <button class="edit"><a href="edit.php?id=<?php echo $file['id'] ?>" class="edit_a">edit</a></button>
+          <button class="delete"><a href="delete.php?id=<?php echo $file['id'] ?>" class="delete_a">×</a></button>
           <div class="img_text">
-            <img src="<?php echo "{$file['file_path']}"; ?>" alt="">
+            <img src="<?php echo "{$file['file_path']}"; ?>" alt="" class="mainimg">
+            <div class="username"><?php echo "{$file['userid']}"; ?></div>
+            <img src="" alt="" class="usericon">
             <p><?php echo "{$file['description']}"; ?></p>
           </div>
         </div>
@@ -44,29 +75,42 @@ $files = getALLfile();
     </div>
   </div>
 
+  <script>
+    const file1 = document.getElementById('file1');
+    const preview = document.getElementById('preview');
+
+    file1.onchange = function(e) {
+      var file = e.target.files[0];
+      var blobUrl = window.URL.createObjectURL(file);
+      preview.src = blobUrl;
+    }
+  </script>
+
+  <script>
+    const jsonData = <?= $json ?>;
+    const user = `<?= $_SESSION["username"]; ?>`
+
+    const no = document.getElementsByClassName('username');
+    const icon = document.getElementsByClassName('usericon');
+    const edit = document.getElementsByClassName('edit_a');
+    const de = document.getElementsByClassName('delete_a');
+
+    window.onload = onLoad;
+
+    function onLoad() {
+      for (let i = 0; i < no.length; i++) {
+        // console.log(no[i].textContent);
+        for (let n = 0; n < jsonData.length; n++) {
+          // console.log(jsonData[n].username);
+          if (jsonData[n].id == no[i].textContent) {
+            no[i].textContent = jsonData[n].username;
+            icon[i].src = jsonData[n].profile_image;
+          }
+        }
+      }
+    }
+  </script>
+
 </body>
 
 </html>
-
-<?php
-// //ディレクトリ名
-// $dir_path = "./images";
-// if (is_dir($dir_path)) {
-//   if (is_readable($dir_path)) { // ? ファイルが読み込み可能かどうか
-//     $ch_dir = dir($dir_path); //ディレクトリクラス
-//     //ディレクトリ内の画像を一覧表示
-//     while (false !== ($file_name = $ch_dir->read())) {
-//       $ln_path = $ch_dir->path . "/" . $file_name;
-//       if (@getimagesize($ln_path)) { //画像かどうか？
-//         echo "<a href = \"imgview.php?d=" . urlencode(mb_convert_encoding($ln_path, "UTF-8")) . "\" target = \"_blank\" >";
-//         echo "<img src = \"" . $ln_path . "\" width=\"200\"></a> ";
-//       }
-//     }
-//     $ch_dir->close();
-//   } else {
-//     echo "<p>" . htmlspecialchars($dir_path) . "は読み込みが許可されていません。";
-//   }
-// } else {
-//   echo 'DIR 画像がないよ';
-// }
-?>

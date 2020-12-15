@@ -7,7 +7,7 @@ $file = $_FILES['image'];
 
 // ファイル関連の取得 http://localhost/upload/upload_form.php
 $filename = basename($file['name']);
-$tmp_path = $file['tmp_name'];
+$tmp_path = $file['{tmp_name}'];
 $file_err = $file['error'];
 $filesize = $file['size'];
 $upload_dir = './images/';
