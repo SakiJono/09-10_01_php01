@@ -29,6 +29,7 @@ if (!$val) {
   $_SESSION["session_id"] = session_id();
   $_SESSION["is_admin"] = $val["is_admin"];
   $_SESSION["username"] = $val["username"];
+  $_SESSION["id"] = $val["id"];
   header("Location:upload_form.php");
   exit();
 }

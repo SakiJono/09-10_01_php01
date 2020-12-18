@@ -67,7 +67,7 @@ if ($status == false) {
 
   <fieldset>
     <legend>ユーザーリスト</legend>
-    <a href="userdata_register.php">入力画面</a>
+    <a href="upload_form.php">HOME</a>
     <table>
       <thead>
         <tr>

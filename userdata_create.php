@@ -88,6 +88,6 @@ if ($status == false) {
     move_uploaded_file($icon_path, $save_icon);
   }
   // 正常にSQLが実行された場合は入力ページファイルに移動し，入力ページの処理を実行する
-  header("Location:userdata_read.php");
+  header("Location:upload_form.php");
   exit();
 }

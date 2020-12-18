@@ -88,10 +88,11 @@
 .edit{
   right: 25px;
 }
-
-
-.others{
-  display: none;
+.like{
+  position:absolute;
+  right: 0px;
+  background-color: transparent;
+  border-style: none;
 }
 
 .edit_a,.delete_a{
@@ -101,9 +102,19 @@
   font-weight: bold;
 }
 
-.edit a{
+.edit_a{
   font-size: 16px;
 }
+
+.like_a{
+  text-decoration: none;
+  color:rgb(253, 95, 95);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+
 
 
 

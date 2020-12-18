@@ -1,6 +1,6 @@
 <?php
 require_once "./dbc.php";
-$files = getALLfile();
+// $files = getALLfile();
 ?>
 
 <?php
@@ -8,6 +8,7 @@ session_start(); // 必須！
 check_session_id();
 include('userdata_table.php');
 $pdo = connect_to_db();
+$userid = $_SESSION["id"];
 
 // データ取得SQL作成
 $sql = 'SELECT * FROM users_table';
@@ -24,6 +25,21 @@ if ($status == false) {
 }
 ?>
 
+<?php
+$sql = 'SELECT * FROM file_table 
+LEFT OUTER JOIN (SELECT fileid, COUNT(id) AS cnt
+FROM like_table GROUP BY fileid) AS likes
+ON file_table.id = likes.fileid ORDER BY id DESC';
+$stmt = $pdo->prepare($sql);
+$status = $stmt->execute();
+if ($status == false) {
+  $error = $stmt->errorInfo();
+  exit('sqlError:' . $error[2]);
+} else {
+  $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $json2 = json_encode($files);
+}
+?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -41,7 +57,7 @@ if ($status == false) {
     <div class="headerbtn">Home</div>
     <div class="headerbtn">Search</div>
     <div class="headerbtn"><a href="logout.php">logout</a></div>
-    <div class="headerbtn"><a href="userdata_read.php">Administrator</a></div>
+    <div class="headerbtn" id="admi"><a href="userdata_read.php">Administrator</a></div>
   </header>
 
   <div class="upload">
@@ -69,6 +85,7 @@ if ($status == false) {
             <div class="username"><?php echo "{$file['userid']}"; ?></div>
             <img src="" alt="" class="usericon">
             <p><?php echo "{$file['description']}"; ?></p>
+            <button class="like"><a href="like.php?user_id=<?php echo "{$file['userid']}" ?>&file_id=<?php echo "{$file['id']}"; ?>" class="like_a">♡<?php echo "{$file['cnt']}"; ?></a></button>
           </div>
         </div>
       <?php endforeach; ?>
@@ -76,6 +93,7 @@ if ($status == false) {
   </div>
 
   <script>
+    // プレビュー
     const file1 = document.getElementById('file1');
     const preview = document.getElementById('preview');
 
@@ -89,17 +107,30 @@ if ($status == false) {
   <script>
     const jsonData = <?= $json ?>;
     const user = `<?= $_SESSION["username"]; ?>`
+    const userid = `<?= $_SESSION["id"]; ?>`
+    const admin = `<?= $_SESSION["is_admin"]; ?>`
+
+    console.log(user, userid, admin);
 
     const no = document.getElementsByClassName('username');
     const icon = document.getElementsByClassName('usericon');
     const edit = document.getElementsByClassName('edit_a');
     const de = document.getElementsByClassName('delete_a');
+    const admi = document.getElementById('admi');
 
     window.onload = onLoad;
+
+    if (admin == 0) {
+      admi.style.display = 'none';
+    }
 
     function onLoad() {
       for (let i = 0; i < no.length; i++) {
         // console.log(no[i].textContent);
+        if (no[i].textContent != userid) {
+          edit[i].style.display = 'none';
+          de[i].style.display = 'none';
+        }
         for (let n = 0; n < jsonData.length; n++) {
           // console.log(jsonData[n].username);
           if (jsonData[n].id == no[i].textContent) {
@@ -109,6 +140,8 @@ if ($status == false) {
         }
       }
     }
+    const json2 = <?= $json2 ?>;
+    console.log(json2)
   </script>
 
 </body>

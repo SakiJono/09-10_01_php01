@@ -34,17 +34,18 @@ function dbc()
  */
 
 
-function fileSave($filename, $save_path, $caption)
+function fileSave($filename, $save_path, $caption, $userid)
 {
   $result = False;
 
-  $sql = "INSERT INTO file_table (file_name,file_path,description) VALUE(?,?,?)";
+  $sql = "INSERT INTO file_table (file_name,file_path,description,userid) VALUE(?,?,?,?)";
 
   try {
     $stmt = dbc()->prepare($sql);
     $stmt->bindValue(1, $filename);
     $stmt->bindValue(2, $save_path);
     $stmt->bindValue(3, $caption);
+    $stmt->bindValue(4, $userid);
     $result = $stmt->execute();
     return $result;
   } catch (\Exception $e) {

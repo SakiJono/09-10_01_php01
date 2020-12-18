@@ -2,12 +2,19 @@
 
 require_once "./dbc.php";
 
+session_start(); // 必須！
+check_session_id();
+include('userdata_table.php');
+$pdo = connect_to_db();
+$userid = $_SESSION["id"];
+
+
 $file = $_FILES['image'];
 
 
 // ファイル関連の取得 http://localhost/upload/upload_form.php
 $filename = basename($file['name']);
-$tmp_path = $file['{tmp_name}'];
+$tmp_path = $file['tmp_name'];
 $file_err = $file['error'];
 $filesize = $file['size'];
 $upload_dir = './images/';
@@ -49,7 +56,7 @@ if (count($err_msgs) === 0) {
     if (move_uploaded_file($tmp_path, $save_path)) {
       // echo $filename . 'を' . $upload_dir . 'アップしました。';
       //DBに保存（ファイル名、ファイルパス、キャプション）
-      $result = fileSave($filename, $save_path, $caption);
+      $result = fileSave($filename, $save_path, $caption, $userid);
 
       if ($result) {
         // echo 'データベースに保存しました';
